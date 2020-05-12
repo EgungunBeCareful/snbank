@@ -1,209 +1,137 @@
 #-*-coding:utf8;-*-
-#qpy:console
-
-print "This is console module"
+#qpy:
 
 import pickle
 import os
 import pathlib
-class Account :
-    accNo = random.randint(1000000000, 9999999999)
-    name = ''
-    deposit=0
-    acctype = ''
-    email = ''
-    
-    def createAccount(self):
-        self.accNo= print(int("Account no : "))
-        self.name = input("Enter the account holder name : ")
-        self.acctype = input("Ente the type of account [C/S] : ")
-        self.deposit = int(input("Enter The Initial amount(>=500 for Saving and >=1000 for current"))
-        print("\n\n\nAccount Created")
-    
-    def showAccount(self):
-        print("Account Number : ",self.accNo)
-        print("Account Holder Name : ", self.name)
-        print("Type of Account",self.acctype)
-        print("Balance : ",self.deposit)
-        print("Email: ",self.email)
-    
-    def report(self):
-        print(self.accNo, " ",self.name ," ",self.email," ",self.acctype," ", self.deposit)
-    
-    def getAccountNo(self):
-        return self.accNo
-    def getAcccountHolderName(self):
-        return self.name
-    def getAccountType(self):
-        return self.acctype
-    def getDeposit(self):
-        return self.deposit
-    def getEmail(self):
-        return self.email
-    
 
-def intro():
-    print("\t\t\t\t**********************")
-    print("\t\t\t\tBANK MANAGEMENT SYSTEM")
-    print("\t\t\t\t**********************")
-    input()
+def getDetails():
+    with open('staff.txt') as file:
+        staff_details = file.readlines() 
+        file.close() 
+        return staff_details
 
-def writeAccount():
-    account = Account()
-    account.createAccount()
-    writeAccountsFile(account)
-
-def displayAll():
-    file = pathlib.Path("customer.txt")
-    if file.exists ():
-        infile = open('accounts.data','rb')
-        mylist = pickle.load(infile)
-        for item in mylist :
-            print(item.accNo," ", item.name, " ",item.type, " ",item.deposit )
-        infile.close()
-    else :
-        print("No records to display")
+def saveSession(user_name, user_pwd):
+    with open("temp.txt", "w", encoding='utf-8') as file:
+         file.write('{}\n'.format(user_name)) 
+         file.write('{}\n'.format(user_pwd)) 
+         session = [user_name, user_pwd] 
+         return session
+         
+def saveAccount(customer_details):
+    with open('customer.txt', 'w') as file:
+        for item in customer_details:
+            file.write("{}\n".format(item))
         
-        
-def displaySp(num): 
-    file = pathlib.Path("accounts.data")
-    if file.exists ():
-        infile = open('accounts.data','rb')
-        mylist = pickle.load(infile)
-        infile.close()
-        found = False
-        for item in mylist :
-            if item.accNo == num :
-                print("Your account Balance is = ",item.deposit)
-                found = True
-    else :
-        print("No records to Search")
-    if not found :
-        print("No existing record with this number")
+def displayDetails(acctNo):
+    with open('customer.txt', 'w+') as f:
+        read_data = f.readlines()
+        f.close()
+        if(acctno == read_data[4].strip('\n')):
+            return read_data 
+            
+def confirmFile(file):
+    if os.path.exists(file): 
+    return True 
+    
+def deleteSession(filename):
+    if os.path.exists(filename): 
+    os.remove(filename)   
+      
 
-def depositAndWithdraw(num1,num2): 
-    file = pathlib.Path("accounts.data")
-    if file.exists ():
-        infile = open('accounts.data','rb')
-        mylist = pickle.load(infile)
-        infile.close()
-        os.remove('accounts.data')
-        for item in mylist :
-            if item.accNo == num1 :
-                if num2 == 1 :
-                    amount = int(input("Enter the amount to deposit : "))
-                    item.deposit += amount
-                    print("Your account is updted")
-                elif num2 == 2 :
-                    amount = int(input("Enter the amount to withdraw : "))
-                    if amount <= item.deposit :
-                        item.deposit -=amount
-                    else :
-                        print("You cannot withdraw larger amount")
-                
-    else :
-        print("No records to Search")
-    outfile = open('newaccounts.data','wb')
-    pickle.dump(mylist, outfile)
-    outfile.close()
-    os.rename('newaccounts.data', 'accounts.data')
+def appOptions(session):
+    try:
+        print("1. Create new bank account \n2. Check Account Details \n3. Logout ")
+        staff_option = int(input("Please choose option 1 or 2 or 3? ")) 
+        if(staff_option == 1):
+            #get user account details for creating account 
+            accName = input("Enter Customer's full name: ") 
+            deposit = input("Enter opening deposit: ") 
+            accType = input("Enter Chosen Account type C/S:") 
+            accEmail = input("Please provide Email Address:") 
+            accNumber = random.randint(1000000000,9999999999) #generate random 10 numbers
+            print(f'Your new account number is: {accNumber}')
+           
+            customer_details = [accName, deposit, accType, accEmail, accNumber]
+             
+             # Save information in customers file 
+            saveAccount(customer_details) 
+            appOptions(session) 
+             
+         elif(staff_option == 2):
+             while(confirmFile('temp.txt')):
+                 inputAccNo = input("Please provide Account Number: ")
+                 print("The account details are as follows: ")
+                 returnDetails = displayDetails(inputAccNo) 
+                 print(f"{customer_details}") 
+                 appOptions(session)
+         elif(staff_option == 3):
+             print("*******Logging out*****") 
+             
+             #delete user session
+             deleteSession('temp.txt')
+         else: print(" Try again")
+     except ValueError:
+         print("******Please Enter a valid number******") 
 
-    
-def deleteAccount(num):
-    file = pathlib.Path("accounts.data")
-    if file.exists ():
-        infile = open('accounts.data','rb')
-        oldlist = pickle.load(infile)
-        infile.close()
-        newlist = []
-        for item in oldlist :
-            if item.accNo != num :
-                newlist.append(item)
-        os.remove('accounts.data')
-        outfile = open('newaccounts.data','wb')
-        pickle.dump(newlist, outfile)
-        outfile.close()
-        os.rename('newaccounts.data', 'accounts.data')
-     
-def modifyAccount(num):
-    file = pathlib.Path("accounts.data")
-    if file.exists ():
-        infile = open('accounts.data','rb')
-        oldlist = pickle.load(infile)
-        infile.close()
-        os.remove('accounts.data')
-        for item in oldlist :
-            if item.accNo == num :
-                item.name = input("Enter the account holder name : ")
-                item.type = input("Enter the account Type : ")
-                item.deposit = int(input("Enter the Amount : "))
-        
-        outfile = open('newaccounts.data','wb')
-        pickle.dump(oldlist, outfile)
-        outfile.close()
-        os.rename('newaccounts.data', 'accounts.data')
-   
+def appRegister():
+    if not os.path.exists('staff.txt'):
+        file = open('staff.txt', 'w')
+        file.close() 
+        username = input('Enter username: ')
+        if username in open('staff.txt', 'r').read():
+            print('Username already exists') 
+            exit() 
+            password = input('Enter password: ')
+            c_password = input('Enter confirm password: ') 
+            if password != c_password:
+                print('Sorry password do not match') 
+                exit()
+                handle = open('staff.txt', 'a') 
+                handle.write(username) 
+                handle.write(' ') 
+                handle.write(password) 
+                handle.write('\n') 
+                handle.close() 
+                print('User was successfully registered')
+                exit()
 
-def writeAccountsFile(account) : 
-    
-    file = pathlib.Path("accounts.data")
-    if file.exists ():
-        infile = open('accounts.data','rb')
-        oldlist = pickle.load(infile)
-        oldlist.append(account)
-        infile.close()
-        os.remove('accounts.data')
-    else :
-        oldlist = [account]
-    outfile = open('newaccounts.data','wb')
-    pickle.dump(oldlist, outfile)
-    outfile.close()
-    os.rename('newaccounts.data', 'accounts.data')
-    
-        
-# start of the program
-ch=''
-num=0
-intro()
+def appLogin():
+    {1:'Login', 2:'Close App'} 
+    while True:
+        try:
+            print("1. Login \n2. Close App")
+            user_choice = int(input("Please choose option 1 or 2? "))
+            if(user_choice == 1):
+                username1 = input("USERNAME: ")
+                password1 = input("PASSWORD: ")
+                for row in file:
+                    field = row.split(",") 
+                    username = field[0]
+                    password = field[1]
+                    lastchar = len(password)-1 
+                    password = password[0:lastchar]
+                    if username1 == username and password1 == password:
+                        print("Hello",username)
+                        break 
+                    else:
+                        print("incorrect")
+                         
+                 print("Login successful, Welcome, (user_name1)") 
+            else:
+                 print("------------Please Try again---------------\nYour credentials do not match any record") 
+       elif(options == 2):
+           print("Good bye! Thank you for using Bank Management System")
+           break 
+       else:
+           print("Please Try again") 
+       except ValueError:
+           print("******Please Enter a valid number******")
 
-while ch != 8:
-    #system("cls");
-    print("\tMAIN MENU")
-    print("\t1. NEW ACCOUNT")
-    print("\t2. DEPOSIT AMOUNT")
-    print("\t3. WITHDRAW AMOUNT")
-    print("\t4. BALANCE ENQUIRY")
-    print("\t5. ALL ACCOUNT HOLDER LIST")
-    print("\t6. CLOSE AN ACCOUNT")
-    print("\t7. MODIFY AN ACCOUNT")
-    print("\t8. EXIT")
-    print("\tSelect Your Option (1-8) ")
-    ch = input()
-    #system("cls");
-    
-    if ch == '1':
-        writeAccount()
-    elif ch =='2':
-        num = int(input("\tEnter The account No. : "))
-        depositAndWithdraw(num, 1)
-    elif ch == '3':
-        num = int(input("\tEnter The account No. : "))
-        depositAndWithdraw(num, 2)
-    elif ch == '4':
-        num = int(input("\tEnter The account No. : "))
-        displaySp(num)
-    elif ch == '5':
-        displayAll();
-    elif ch == '6':
-        num =int(input("\tEnter The account No. : "))
-        deleteAccount(num)
-    elif ch == '7':
-        num = int(input("\tEnter The account No. : "))
-        modifyAccount(num)
-    elif ch == '8':
-        print("\tThanks for using bank managemnt system")
-        break
-    else :
-        print("Invalid choice")
-    
-    ch = input("Enter your choice : ")
+user = input("Are you already a registered user? yes/no") 
+if user == "yes":
+    appLogin() 
+elif user =="no":
+    appRegister() 
+
+print("Welcome to SN Bank")
