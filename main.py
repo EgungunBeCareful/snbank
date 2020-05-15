@@ -1,5 +1,5 @@
 import os
-import pathlib
+import random
 
 def getDetails():
     with open('staff.txt') as file:
