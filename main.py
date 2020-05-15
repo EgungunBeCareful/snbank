@@ -1,7 +1,3 @@
-#-*-coding:utf8;-*-
-#qpy:
-
-import pickle
 import os
 import pathlib
 
@@ -13,11 +9,11 @@ def getDetails():
 
 def saveSession(user_name, user_pwd):
     with open("temp.txt", "w", encoding='utf-8') as file:
-         file.write('{}\n'.format(user_name)) 
-         file.write('{}\n'.format(user_pwd)) 
-         session = [user_name, user_pwd] 
-         return session
-         
+        file.write('{}\n'.format(user_name)) 
+        file.write('{}\n'.format(user_pwd)) 
+        session = [user_name, user_pwd] 
+        return session
+
 def saveAccount(customer_details):
     with open('customer.txt', 'w') as file:
         for item in customer_details:
@@ -32,13 +28,13 @@ def displayDetails(acctNo):
             
 def confirmFile(file):
     if os.path.exists(file): 
-    return True 
+        return True 
     
 def deleteSession(filename):
     if os.path.exists(filename): 
-    os.remove(filename)   
-      
+        os.remove(filename)   
 
+        
 def appOptions(session):
     try:
         print("1. Create new bank account \n2. Check Account Details \n3. Logout ")
@@ -58,21 +54,22 @@ def appOptions(session):
             saveAccount(customer_details) 
             appOptions(session) 
              
-         elif(staff_option == 2):
-             while(confirmFile('temp.txt')):
-                 inputAccNo = input("Please provide Account Number: ")
-                 print("The account details are as follows: ")
-                 returnDetails = displayDetails(inputAccNo) 
-                 print(f"{customer_details}") 
-                 appOptions(session)
-         elif(staff_option == 3):
-             print("*******Logging out*****") 
-             
-             #delete user session
-             deleteSession('temp.txt')
-         else: print(" Try again")
-     except ValueError:
-         print("******Please Enter a valid number******") 
+        elif(staff_option == 2):
+            while(confirmFile('temp.txt')):
+                inputAccNo = input("Please provide Account Number: ")
+                print("The account details are as follows: ")
+                returnDetails = displayDetails(inputAccNo) 
+                print(f"{customer_details}") 
+                appOptions(session)
+        elif(staff_option == 3):
+            print("*******Logging out*****") 
+
+            #delete user session
+            deleteSession('temp.txt')
+        else: 
+            print(" Try again")
+    except ValueError:
+        print("******Please Enter a valid number******") 
 
 def appRegister():
     if not os.path.exists('staff.txt'):
@@ -115,18 +112,14 @@ def appLogin():
                         print("Hello",username)
                         break 
                     else:
-                        print("incorrect")
-                         
-                 print("Login successful, Welcome, (user_name1)") 
+                        print("incorrect") 
+            elif(options == 2):
+                print("Good bye! Thank you for using Bank Management System")
+                break 
             else:
-                 print("------------Please Try again---------------\nYour credentials do not match any record") 
-       elif(options == 2):
-           print("Good bye! Thank you for using Bank Management System")
-           break 
-       else:
-           print("Please Try again") 
-       except ValueError:
-           print("******Please Enter a valid number******")
+                print("Please Try again") 
+        except ValueError:
+            print("******Please Enter a valid number******")
 
 user = input("Are you already a registered user? yes/no") 
 if user == "yes":
